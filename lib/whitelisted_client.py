@@ -15,7 +15,7 @@ class WhitelistedClient:
         self.url = url.removesuffix('/')
         self.token = token
         
-    def add(self, uuid: Optional[UUID] = None, name: Optional[str] = None):
+    def add(self, uuid: Optional[UUID] = None, name: Optional[str] = None) -> ProfileEntry:
         res = requests.get(f'{self.url}/add', {
             "token": self.token,
             "uuid": str(uuid),
@@ -23,7 +23,8 @@ class WhitelistedClient:
         })
         content = json.loads(res.content.decode())
         if res.status_code != 200:
-            raise RuntimeError(f'add failed: got status code {res.status_code}, message: {content['errorMessage']}')
+            raise RuntimeError(f'add failed: got status code {res.status_code}, message: {content["errorMessage"]}')
+        return ProfileEntry(**content['data'])
     
     def remove(self, uuid: Optional[UUID] = None, name: Optional[str] = None):
         res = requests.get(f'{self.url}/remove', {
@@ -33,7 +34,7 @@ class WhitelistedClient:
         })
         content = json.loads(res.content.decode())
         if res.status_code != 200:
-            raise RuntimeError(f'remove failed: got status code {res.status_code}, message: {content['errorMessage']}')
+            raise RuntimeError(f'remove failed: got status code {res.status_code}, message: {content["errorMessage"]}')
     
     def query(self, uuid: Optional[UUID] = None, name: Optional[str] = None, timestamp: Optional[int] = None) -> bool:
         res = requests.get(f'{self.url}/query', {
@@ -44,16 +45,16 @@ class WhitelistedClient:
         })
         content = json.loads(res.content.decode())
         if res.status_code != 200:
-            raise RuntimeError(f'query failed: got status code {res.status_code}, message: {content['errorMessage']}')
+            raise RuntimeError(f'query failed: got status code {res.status_code}, message: {content["errorMessage"]}')
         return content['data']
         
-    def listAll(self) -> list:
+    def listAll(self) -> list[ProfileEntry]:
         res = requests.get(f'{self.url}/list', {
             "token": self.token
         })
         content = json.loads(res.content.decode())
         if res.status_code != 200:
-            raise RuntimeError(f'listAll failed: got status code {res.status_code}, message: {content['errorMessage']}')
+            raise RuntimeError(f'listAll failed: got status code {res.status_code}, message: {content["errorMessage"]}')
         data: list = content['data']
         
         return [ProfileEntry(uuid=i['uuid'], name=i['name'], timestamp=i['timestamp']) for i in data]
