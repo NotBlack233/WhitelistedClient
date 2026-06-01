@@ -1,8 +1,18 @@
 import requests
 import json
+from enum import IntEnum
 from uuid import UUID
 from typing import Optional
 from dataclasses import dataclass
+
+class ErrorCode(IntEnum):
+    UNKNOWN = 0
+    INVALID_TOKEN = 101
+    INVALID_ARGUMENT = 102
+    MOJANG_API_NOT_FOUND = 1001
+    MOJANG_API_TOO_MANY_REQUESTS = 1002
+    WHITELIST_DUPLICATE_ENTRY = 1003
+    WHITELIST_NOT_FOUND = 1004
 
 @dataclass(frozen=True, kw_only=True)
 class ProfileEntry:
