@@ -14,6 +14,23 @@ class ErrorCode(IntEnum):
     WHITELIST_DUPLICATE_ENTRY = 1003
     WHITELIST_NOT_FOUND = 1004
 
+class WhitelistError(Exception):
+    _error_code: int
+    
+    def __init__(self, errorcode: int = ErrorCode.UNKNOWN, *args: object) -> None:
+        self._error_code = errorcode
+        super().__init__(*args)
+    
+    def __str__(self) -> str:
+        return f'error_code={self._error_code}, {super().__str__()}'
+    
+    def __repr__(self) -> str:
+        return f'WhitelistError({self._error_code}, {", ".join([str(i) for i in self.args])})'
+    
+    @property
+    def error_code(self):
+        return self._error_code
+
 @dataclass(frozen=True, kw_only=True)
 class ProfileEntry:
     uuid: UUID
@@ -33,7 +50,7 @@ class WhitelistedClient:
         })
         content = json.loads(res.content.decode())
         if res.status_code != 200:
-            raise RuntimeError(f'add failed: got status code {res.status_code}, message: {content["errorMessage"]}')
+            raise WhitelistError(content["errorCode"], content["errorMessage"])
         return ProfileEntry(**content['data'])
     
     def remove(self, uuid: Optional[UUID] = None, name: Optional[str] = None):
