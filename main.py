@@ -1,7 +1,7 @@
-from lib.config import Config
+from lib.config import load_config
 from lib.whitelisted_client import WhitelistedClient
 
-config = Config()
+config = load_config()
 
 client = WhitelistedClient(config.url, config.token)
 
